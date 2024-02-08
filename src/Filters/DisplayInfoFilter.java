@@ -1,5 +1,6 @@
 package Filters;
 
+import Interfaces.Interactive;
 import Interfaces.PixelFilter;
 import core.DImage;
 
@@ -7,7 +8,10 @@ import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DisplayInfoFilter implements PixelFilter {
+public class DisplayInfoFilter implements PixelFilter, Interactive {
+    private int cropWidth;
+    private int cropHeight;
+
     public DisplayInfoFilter() {
         System.out.println("Filter running...");
         cropHeight = 670;
@@ -35,7 +39,6 @@ public class DisplayInfoFilter implements PixelFilter {
                 if (grid[r][c] > 240) whiteCount++;
             }
         }
-
         System.out.println(blackCount + " nearly black pixels and " + whiteCount + " nearly white pixels");
         getBubbledAnswer(grid, 20, 200,12);
 
