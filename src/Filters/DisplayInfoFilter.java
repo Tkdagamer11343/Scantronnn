@@ -15,7 +15,7 @@ public class DisplayInfoFilter implements PixelFilter, Interactive {
     public DisplayInfoFilter() {
         System.out.println("Filter running...");
         cropHeight = 670;
-        cropWidth = 520; // 520
+        cropWidth = 520; // 520l
     }
 
     @Override
