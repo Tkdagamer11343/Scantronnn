@@ -57,7 +57,7 @@ public class DisplayInfoFilter implements PixelFilter, Interactive {
     }
 
 
-      public void getBubbledAnswer (short[][] grid, int startR, int startC, int deltaR, int deltaC, int bubbleSize, int answerThreshold, int numQuestions){
+    /*public void getBubbledAnswer (short[][] grid, int startR, int startC, int deltaR, int deltaC, int bubbleSize, int answerThreshold, int numQuestions){
            for (int i = 0; i < numQuestions; i++) {
              getAveragePixelVal(grid, startR, startC, bubbleSize);
 
@@ -76,41 +76,48 @@ public class DisplayInfoFilter implements PixelFilter, Interactive {
              }
              bubbledAnswer++;
           }
-        }
+        }*/
     public void getBubbledAnswer(short[][] grid, int bubbleSize, int answerThreshold, int numQuestions) {
-        int numChoices = grid[0].length / bubbleSize; // Assume each answer choice takes up an equal amount of space
-        int[] answers = new int[numQuestions];
+        int[][] answerRanges = {{50, 70}, {74, 94}, {100, 120}, {124, 144}, {148, 168}};
+        char[] answerLetters = {'A', 'B', 'C', 'D', 'E'};
+        int rowSize = 20;
+        int rowSkip = 30;
+        int questionsProcessed = 0;
 
-        for (int i = 0; i < numQuestions; i++) {
-            int darkestValue = 255;
-            int darkestIndex = -1;
-            for (int j = 0; j < numChoices; j++) {
-                int total = 0;
-                int count = 0;
-                for (int r = i * bubbleSize; r < (i + 1) * bubbleSize; r++) {
-                    for (int c = j * bubbleSize; c < (j + 1) * bubbleSize; c++) {
-                        total += grid[r][c];
-                        count++;
+        for (int i = 0; i < numQuestions && questionsProcessed < 12; i++) {
+            int startRow = i * (rowSize + rowSkip);
+            if (startRow + rowSize <= grid.length) { // Replaced continue with if statement
+                for (int j = 0; j < answerRanges.length; j++) {
+                    if (answerRanges[j][1] <= grid[0].length) { // Replaced continue with if statement
+                        int total = 0;
+                        int count = 0;
+                        for (int r = startRow; r < startRow + rowSize; r++) {
+                            for (int c = answerRanges[j][0]; c < answerRanges[j][1]; c++) {
+                                total += grid[r][c];
+                                count++;
+                            }
+                        }
+                        int average = total / count;
+                        if (average >= 130 && average <= 145) {
+                            System.out.println("Question " + (questionsProcessed + 1) + ": Answer " + answerLetters[j] + " has an average RGB value within the range 130 to 145.");
+                        }
+                        if (average < answerThreshold) {
+                            System.out.println("Question " + (questionsProcessed + 1) + ": Answer " + answerLetters[j]);
+                            questionsProcessed++;
+                        }
                     }
                 }
-                int average = total / count;
-                if (average < darkestValue) {
-                    darkestValue = average;
-                    darkestIndex = j;
-                }
             }
-            answers[i] = darkestIndex;
-            System.out.println("Question " + (i + 1) + ": Answer " + (darkestIndex + 1));
         }
     }
 
 
-    public double getAveragePixelVal ( short[][] grid, int row, int col, int bubbleSize){
+    public double getAveragePixelVal(short[][] grid, int row, int col, int bubbleSize) {
         double total = 0;
         int count = 0;
 
-        for (int r = row - bubbleSize; r < row + bubbleSize; r++) {
-            for (int c = col - bubbleSize; c < col + bubbleSize; c++) {
+        for (int r = Math.max(0, row - bubbleSize); r < Math.min(grid.length, row + bubbleSize); r++) {
+            for (int c = Math.max(0, col - bubbleSize); c < Math.min(grid[0].length, col + bubbleSize); c++) {
                 total += grid[r][c];
                 count++;
             }
